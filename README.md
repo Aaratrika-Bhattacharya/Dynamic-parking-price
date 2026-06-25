@@ -1,77 +1,214 @@
-# Dynamic-parking-price
-It is designed to dynamically calculate parking prices based on real-time occupancy and capacity data for multiple parking spaces.
+# 🚗 Real-Time Dynamic Parking Pricing System
 
+A real-time dynamic parking pricing system that computes adaptive parking fees based on live demand indicators such as occupancy, queue length, traffic conditions, special events, and vehicle characteristics. The project combines demand modeling with real-time data processing concepts using Pathway and Python to simulate an intelligent parking management system.
 
-## Overview
+---
 
-Model 1 is designed to dynamically calculate parking prices based on real-time occupancy and capacity data for multiple parking spaces. The workflow leverages Python (Pandas) for data processing and Pathway for scalable, schema-driven, and streaming data operations.
+## 📌 Project Overview
 
-## Stepwise Process
+Traditional parking systems often use fixed pricing irrespective of demand, leading to inefficient space utilization and congestion. This project implements a demand-driven pricing engine that dynamically adjusts parking prices using multiple real-world factors.
 
-### 1. Data Ingestion
+The system:
+- Calculates a composite demand score from multiple features.
+- Generates adaptive parking prices based on current demand.
+- Applies price smoothing to avoid abrupt fluctuations.
+- Simulates real-time pricing updates.
+- Visualizes pricing trends for operational insights.
 
-- **Input:** A CSV file (`dataset.csv`) containing parking data with columns such as `ID`, `SystemCodeNumber`, `Capacity`, `Occupancy`, `Timestamp`, and other metadata.
-- **Tools:** Pandas, Pathway.
+---
 
-### 2. Preprocessing and Sorting
+## ✨ Features
 
-- **Sort** the DataFrame by `ID` and `Timestamp` to ensure chronological order for each parking space.
-- **Group** the data by `ID` so that each parking space's time series is processed independently.
+- 📈 Multi-factor demand score calculation
+- 🚗 Dynamic parking price generation
+- 📊 Occupancy and demand analytics
+- 🔄 Real-time pricing simulation
+- ⚡ Stream processing concepts using Pathway
+- 📉 Price smoothing for stable pricing
+- 📍 Parking-lot level pricing analysis
 
-### 3. Price Calculation (Pandas)
+---
 
-- **Initialize Parameters:**  
-  - `alpha`: Sensitivity coefficient for demand (e.g., 1.0).
-  - `base_price`: Minimum starting price (e.g., 10.0).
-- **Iterate** over each group (parking space):
-  - For the first timestamp, set price = `base_price`.
-  - For subsequent rows:
-    - If `Capacity` is zero, carry forward the previous price.
-    - Else, calculate:
-      ```
-      price = previous_price + alpha * (Occupancy / Capacity)
-      ```
-  - **Append** the calculated price to a new `Price` column.
+## 🛠️ Tech Stack
 
-### 4. Output Intermediate Results
+- Python
+- Pathway
+- Pandas
+- NumPy
+- Matplotlib
+- Google Colab
 
-- **Save** the updated DataFrame (with the new `Price` column) as `model1_with_price.csv`.
+---
 
-### 5. Load Data into Pathway
+## 📂 Dataset
 
-- **Define a Schema** in Pathway to match the CSV structure, including the new `Price` column.
-- **Read** the CSV into a Pathway table using the defined schema.
+The dataset contains over **18,000 parking records** with the following attributes:
 
-### 6. Further Processing or Export (Pathway)
+| Feature | Description |
+|----------|-------------|
+| Timestamp | Time of observation |
+| SystemCodeNumber | Parking lot identifier |
+| Capacity | Total parking capacity |
+| Occupancy | Current occupied spaces |
+| QueueLength | Vehicles waiting |
+| TrafficLevel | Nearby traffic condition |
+| IsSpecialDay | Event/Holiday indicator |
+| VehicleTypeWeight | Vehicle demand weight |
+| Latitude | Parking location |
+| Longitude | Parking location |
 
-- **Optionally** perform additional streaming, filtering, or aggregation in Pathway.
-- **Write** the final processed table to `model1_pathway_final.csv`.
+---
 
-## Technology Architecture
+## ⚙️ Pricing Algorithm
 
-| Layer/Step            | Technology         | Purpose                                          |
-|-----------------------|--------------------|--------------------------------------------------|
-| Data Ingestion        | Pandas             | CSV reading, initial DataFrame creation          |
-| Preprocessing         | Pandas             | Sorting, grouping, row-wise price computation    |
-| Intermediate Storage  | CSV                | Exchange format between Pandas and Pathway       |
-| Schema Enforcement    | Pathway            | Strong typing, validation, and further processing|
-| Stream Processing     | Pathway            | Scalable, declarative data pipeline              |
-| Output                | CSV                | Final results for downstream use                 |
+### Step 1 — Demand Score
 
-## Key Points
+The system computes a normalized demand score using multiple operational factors.
 
-- **Vectorization:** The price calculation is row-wise and depends on previous values; thus, it is implemented as a loop within each group.
-- **Separation of Concerns:** Pandas is used for batch calculations, while Pathway handles schema validation and scalable processing.
-- **Modularity:** Each step can be adapted or extended (e.g., to add new features or integrate with real-time data sources).
+Demand Score incorporates:
 
-## How to Run
+- Occupancy Ratio
+- Queue Length
+- Traffic Level
+- Special Day Indicator
+- Vehicle Type Weight
 
-1. Place your input data in `dataset.csv`.
-2. Run the Python script to compute prices and generate `model1_with_price.csv`.
-3. Use Pathway to read the CSV, apply schema, and output the final results as `model1_pathway_final.csv`.
+Weighted demand model:
 
-## Extensibility
+Occupancy Ratio → 45%
 
-- The model can be adapted for real-time streaming data by integrating Pathway’s connectors.
-- The price formula can be extended to include additional factors (e.g., queue length, special days).
+Queue Length → 20%
 
+Traffic Level → 15%
+
+Vehicle Type → 10%
+
+Special Day → 10%
+
+---
+
+### Step 2 — Dynamic Pricing
+
+Parking price is calculated using the demand score:
+
+```
+Dynamic Price = Base Price + (Max Price − Base Price) × Demand Score
+```
+
+where
+
+- Base Price = ₹20
+- Maximum Price = ₹60
+
+---
+
+### Step 3 — Price Smoothing
+
+To prevent sudden fluctuations, prices are smoothed using exponential smoothing:
+
+```
+Smoothed Price =
+Previous Price +
+α(Current Price − Previous Price)
+```
+
+where
+
+```
+α = 0.30
+```
+
+---
+
+## 📊 Workflow
+
+```
+Parking Dataset
+        │
+        ▼
+Data Cleaning
+        │
+        ▼
+Demand Score Calculation
+        │
+        ▼
+Dynamic Pricing Engine
+        │
+        ▼
+Price Smoothing
+        │
+        ▼
+Real-Time Simulation
+        │
+        ▼
+Visualization
+```
+
+---
+
+## 📈 Visualizations
+
+The project includes:
+
+- Occupancy Distribution
+- Dynamic Price Trend
+- Smoothed Price Trend
+- Demand Score Analysis
+
+---
+
+## ▶️ How to Run
+
+1. Open the notebook in Google Colab.
+2. Install the required libraries:
+
+```bash
+pip install pathway pandas numpy matplotlib
+```
+
+3. Upload the parking dataset.
+
+4. Execute all notebook cells sequentially.
+
+---
+
+## 📁 Project Structure
+
+```
+Dynamic-Parking-Pricing/
+│
+├── Dynamic_Parking_Pricing.ipynb
+├── parking_stream.csv
+├── README.md
+└── images/
+```
+
+---
+
+## 🚀 Future Improvements
+
+- Live dashboard using Streamlit
+- Kafka-based real-time streaming
+- Competitor-aware pricing using geospatial distance
+- Time-series demand forecasting
+- REST API deployment
+- Docker containerization
+
+---
+
+## 📚 Key Learnings
+
+- Real-time data processing concepts
+- Demand-based pricing strategies
+- Feature engineering
+- Data visualization
+- Stream processing with Pathway
+- Pricing model design
+
+---
+
+## 👤 Author
+
+**Aaratrika Bhattacharya**
+
+IIT Kharagpur
